@@ -85,9 +85,8 @@ public class PhoneDao {
 		close();
 		return count;
 	}
-	
-	
-	//사람 리스트(검색안할때)
+
+	// 사람 리스트(검색안할때)
 	public List<PersonVo> getPersonList() {
 		return getPersonList("");
 	}
@@ -144,7 +143,53 @@ public class PhoneDao {
 
 	}
 
+	// 사람 1명정보만 가져올때
+	public PersonVo getPerson(int personId) {
+		PersonVo personVo = null;
+		
+		getConnection();
 
+		try {
+
+			// 3. SQL문 준비 / 바인딩 / 실행 --> 완성된 sql문을 가져와서 작성할것
+			String query = "";
+			query += " select  person_id, ";
+			query += "         name, ";
+			query += "         hp, ";
+			query += "         company ";
+			query += " from person ";
+			query += " where person_id = ? ";
+
+			pstmt = conn.prepareStatement(query); // 쿼리로 만들기
+
+			pstmt.setInt(1, personId); // ?(물음표) 중 1번째, 순서중요
+			
+			
+			rs = pstmt.executeQuery();
+
+			// 4.결과처리
+				rs.next();
+				int id = rs.getInt("person_id");
+				String name = rs.getString("name");
+				String hp = rs.getString("hp");
+				String company = rs.getString("company");
+
+				personVo = new PersonVo(id, name, hp, company);
+			
+
+		} catch (SQLException e) {
+			System.out.println("error:" + e);
+		}
+
+		close();
+
+		return personVo;
+
+	}
+
+	
+	
+	
 	// 사람 수정
 	public int personUpdate(PersonVo personVo) {
 		int count = 0;
@@ -206,49 +251,5 @@ public class PhoneDao {
 		close();
 		return count;
 	}
-	
-	  // 사람 1명정보만 가져올때
-	   public PersonVo getPerson(int personId) {
-	      PersonVo personVo = null;
-	     
-	      getConnection();
-
-	      try {
-
-	         // 3. SQL문 준비 / 바인딩 / 실행 --> 완성된 sql문을 가져와서 작성할것
-	         String query = "";
-	         query += " select  person_id, ";
-	         query += "         name, ";
-	         query += "         hp, ";
-	         query += "         company ";
-	         query += " from person ";
-	         query += " where person_id = ? ";
-
-	         pstmt = conn.prepareStatement(query); // 쿼리로 만들기
-
-	         pstmt.setInt(1, personId); // ?(물음표) 중 1번째, 순서중요
-	         
-	         
-	         rs = pstmt.executeQuery();
-
-	         // 4.결과처리
-	            rs.next();
-	            int id = rs.getInt("person_id");
-	            String name = rs.getString("name");
-	            String hp = rs.getString("hp");
-	            String company = rs.getString("company");
-
-	            personVo = new PersonVo(id, name, hp, company);
-	            //처리 실패했을때 없는값이라도 들어갈수있게 위에서 null값 넣어줌
-
-	      } catch (SQLException e) {
-	         System.out.println("error:" + e);
-	      }
-
-	      close();
-
-	      return personVo;
-
-	   }
 
 }
